@@ -1166,5 +1166,49 @@ title="Business Growth Grant Application Form"
             });
         });
     </script>
+
+    <!-- Form Submit Scroll Fix -->
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            // Listen for GoHighLevel form submission messages
+            window.addEventListener("message", function(e) {
+                let data = e.data;
+                try {
+                    if (typeof data === 'string') data = JSON.parse(data);
+                } catch(err) {}
+
+                if (data && (data.type === 'form-submit-successful' || data.message === 'form-submit-successful' || data === 'form-submit-successful')) {
+                    const formSection = document.getElementById('apply');
+                    if (formSection) {
+                        setTimeout(() => {
+                            formSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                        }, 500);
+                    }
+                }
+            });
+
+            // Fallback: Observe iframe height shrinking
+            const iframe = document.querySelector('iframe[src*="smbleadspro.com"]');
+            if (iframe) {
+                const resizeObserver = new ResizeObserver(entries => {
+                    for (let entry of entries) {
+                        if (entry.contentRect.height > 1000) {
+                            entry.target.dataset.wasTall = "true";
+                        } else if (entry.contentRect.height < 1000 && entry.contentRect.height > 100 && entry.target.dataset.wasTall === "true") {
+                            // It shrank drastically (form submitted)
+                            const formSection = document.getElementById('apply');
+                            if (formSection) {
+                                setTimeout(() => {
+                                    formSection.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                                }, 100);
+                            }
+                            entry.target.dataset.wasTall = "false"; // Prevent repeated scrolling
+                        }
+                    }
+                });
+                resizeObserver.observe(iframe);
+            }
+        });
+    </script>
 </body>
 </html>
